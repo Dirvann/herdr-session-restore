@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "savedAt": 1794960000000,
+  "platform": "windows",
+  "ls": { "terminals": [
+    { "address": "t1", "state": "live" }, { "address": "t2", "state": "live" }, { "address": "t3", "state": "live" },
+    { "address": "t4", "state": "live" }, { "address": "t5", "state": "live" }, { "address": "t6", "state": "live" }
+  ] },
+  "get": {
+    "t1": { "address": "t1", "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "foreground": { "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "name": "cmd", "pid": 100 }, "labels": { "herdr.space": "spcA", "herdr.tab": "tab1", "where": "shop / shell" }, "pid": 100, "state": "live" },
+    "t2": { "address": "t2", "argv": ["pwsh.exe"], "cwd": "C:\\Users\\alex\\code\\shop", "foreground": { "argv": ["claude"], "cwd": "C:\\Users\\alex\\code\\shop", "name": "claude", "pid": 210 }, "labels": { "herdr.space": "spcA", "herdr.tab": "tab2", "where": "shop / api" }, "pid": 200, "state": "live" },
+    "t3": { "address": "t3", "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "foreground": { "argv": ["wsl.exe", "-d", "Ubuntu"], "cwd": "C:\\Users\\alex", "name": "wsl", "pid": 310 }, "labels": { "herdr.space": "spcB", "herdr.tab": "tab3", "where": "blog / wsl" }, "pid": 300, "state": "live" },
+    "t4": { "address": "t4", "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex\\code\\shop", "foreground": { "argv": ["npm", "run", "dev"], "cwd": "C:\\Users\\alex\\code\\shop", "name": "npm", "pid": 410 }, "labels": { "herdr.space": "spcA", "herdr.tab": "tab4", "where": "shop / dev" }, "pid": 400, "state": "live" },
+    "t5": { "address": "t5", "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "foreground": { "argv": ["claude"], "cwd": "C:\\Users\\alex", "name": "claude", "pid": 510 }, "labels": {}, "pid": 500, "state": "live" },
+    "t6": { "address": "t6", "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "foreground": { "argv": ["cmd.exe"], "cwd": "C:\\Users\\alex", "name": "cmd", "pid": 600 }, "labels": { "herdr.space": "spcA", "herdr.tab": "tab6", "where": "shop / old" }, "pid": 600, "state": "live" },
+    "devbox/t3": { "address": "devbox/t3", "argv": ["bash"], "cwd": "/home/alex", "foreground": { "argv": ["claude"], "cwd": "/home/alex", "name": "claude", "pid": 710 }, "labels": { "herdr.space": "spcC", "herdr.tab": "tab7", "where": "remote / 1" }, "pid": 700, "state": "live" }
+  },
+  "processes": [
+    { "pid": 100, "ppid": 1, "start": 1794940000000, "name": "cmd.exe", "path": "C:\\Windows\\System32\\cmd.exe" },
+    { "pid": 200, "ppid": 1, "start": 1794950000000, "name": "pwsh.exe", "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
+    { "pid": 210, "ppid": 200, "start": 1794950005000, "name": "claude.exe", "path": "C:\\Users\\alex\\AppData\\Roaming\\npm\\claude.exe" },
+    { "pid": 300, "ppid": 1, "start": 1794950000000, "name": "cmd.exe", "path": "C:\\Windows\\System32\\cmd.exe" },
+    { "pid": 310, "ppid": 300, "start": 1794950001000, "name": "wsl.exe", "path": "C:\\Windows\\System32\\wsl.exe" },
+    { "pid": 320, "ppid": 310, "start": 1794950003000, "name": "claude.exe", "path": "C:\\Users\\alex\\AppData\\Roaming\\npm\\claude.exe" },
+    { "pid": 400, "ppid": 1, "start": 1794950000000, "name": "cmd.exe", "path": "C:\\Windows\\System32\\cmd.exe" },
+    { "pid": 410, "ppid": 400, "start": 1794950002000, "name": "node.exe", "path": "C:\\Program Files\\nodejs\\node.exe" },
+    { "pid": 500, "ppid": 1, "start": 1794950000000, "name": "cmd.exe", "path": "C:\\Windows\\System32\\cmd.exe" },
+    { "pid": 510, "ppid": 500, "start": 1794950001000, "name": "claude.exe", "path": "C:\\Users\\alex\\AppData\\Roaming\\npm\\claude.exe" },
+    { "pid": 600, "ppid": 1, "start": 1794950000000, "name": "cmd.exe", "path": "C:\\Windows\\System32\\cmd.exe" },
+    { "pid": 610, "ppid": 600, "start": 1794955000000, "name": "node.exe", "path": "C:\\Program Files\\nodejs\\node.exe" }
+  ],
+  "sessions": [
+    { "pid": 210, "sessionId": "11111111-1111-4111-8111-111111111111", "cwd": "C:\\Users\\alex\\code\\shop", "startedAt": 1794950007000, "name": "shop-api" },
+    { "pid": 320, "sessionId": "22222222-2222-4222-8222-222222222222", "cwd": "\\\\wsl.localhost\\Ubuntu\\home\\alex\\blog", "startedAt": 1794950004000, "name": "blog" },
+    { "pid": 510, "sessionId": "55555555-5555-4555-8555-555555555555", "cwd": "C:\\Users\\alex", "startedAt": 1794950002000, "name": "hidden" },
+    { "pid": 610, "sessionId": "66666666-6666-4666-8666-666666666666", "cwd": "C:\\Users\\alex", "startedAt": 1794954400000, "name": "stale" }
+  ]
+}

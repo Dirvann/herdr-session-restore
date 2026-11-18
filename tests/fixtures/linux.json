@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "savedAt": 1794962000000,
+  "platform": "linux",
+  "ls": { "terminals": [ { "address": "t1", "state": "live" }, { "address": "t2", "state": "live" } ] },
+  "get": {
+    "t1": { "address": "t1", "argv": ["/bin/bash"], "cwd": "/home/alex", "foreground": { "argv": ["claude"], "cwd": "/home/alex/code/shop", "name": "claude", "pid": 1010 }, "labels": { "herdr.space": "spcL", "herdr.tab": "tabL1", "where": "shop / api" }, "pid": 1000, "state": "live" },
+    "t2": { "address": "t2", "argv": ["bash"], "cwd": "/home/alex", "foreground": { "argv": ["bash"], "cwd": "/home/alex", "name": "bash", "pid": 2000 }, "labels": { "herdr.space": "spcL", "herdr.tab": "tabL2", "where": "shop / shell" }, "pid": 2000, "state": "live" }
+  },
+  "processes": [
+    { "pid": 1, "ppid": 0, "start": "Tue Nov 17 00:00:01 2026", "name": "systemd" },
+    { "pid": 1000, "ppid": 1, "start": "Wed Nov 18 00:20:10 2026", "name": "bash" },
+    { "pid": 1010, "ppid": 1000, "start": "Wed Nov 18 00:20:22 2026", "name": "claude" },
+    { "pid": 2000, "ppid": 1, "start": "Wed Nov 18 00:21:00 2026", "name": "bash" }
+  ],
+  "sessions": [
+    { "pid": 1010, "sessionId": "33333333-3333-4333-8333-333333333333", "cwd": "/home/alex/code/shop", "startedAt": 1794961224500, "name": "shop-api" }
+  ]
+}

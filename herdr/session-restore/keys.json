@@ -1,0 +1,4 @@
+{
+  "global": { "ctrl-shift-r": "mod.open:session-restore" },
+  "mod:session-restore": { "enter": "session-restore.resume" }
+}
