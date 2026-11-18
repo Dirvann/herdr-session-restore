@@ -39,12 +39,14 @@ function ConvertTo-JsonString([string]$s) {
     $b.ToString()
 }
 
-# Runs hc and returns its stdout text, or $null. A real process with redirected output:
-# reliable capture and a timeout, unlike the call operator.
-function Invoke-Hc([string[]]$Arguments) {
+# hc runs as a real process with redirected output: reliable capture, unlike the call
+# operator. Start-Hc returns at once, so many calls can run side by side; Receive-Hc
+# collects one: its stdout text, or $null.
+$script:HcExe = $null
+function Start-Hc([string[]]$Arguments) {
     try {
-        $exe = (Get-Command hc -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
-        $psi = New-Object System.Diagnostics.ProcessStartInfo($exe)
+        if (-not $script:HcExe) { $script:HcExe = (Get-Command hc -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source }
+        $psi = New-Object System.Diagnostics.ProcessStartInfo($script:HcExe)
         $psi.Arguments = ($Arguments | ForEach-Object { if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ } }) -join ' '
         $psi.RedirectStandardOutput = $true
         $psi.RedirectStandardError = $true
@@ -52,45 +54,86 @@ function Invoke-Hc([string[]]$Arguments) {
         $psi.CreateNoWindow = $true
         $psi.StandardOutputEncoding = $Utf8
         $p = [System.Diagnostics.Process]::Start($psi)
-        $err = $p.StandardError.ReadToEndAsync()
-        $out = $p.StandardOutput.ReadToEnd()
-        if (-not $p.WaitForExit(20000)) { try { $p.Kill() } catch {}; return $null }
-        $null = $err.Result
-        if ($p.ExitCode -ne 0 -or -not $out.Trim()) { return $null }
+        @{ process = $p; out = $p.StandardOutput.ReadToEndAsync(); err = $p.StandardError.ReadToEndAsync() }
+    }
+    catch { $null }
+}
+function Receive-Hc($Call) {
+    if (-not $Call) { return $null }
+    try {
+        if (-not $Call.out.Wait(20000)) { try { $Call.process.Kill() } catch {}; return $null }
+        $null = $Call.process.WaitForExit(5000)
+        $out = $Call.out.Result
+        if ($Call.process.ExitCode -ne 0 -or -not $out.Trim()) { return $null }
         $out.Trim()
     }
     catch { $null }
 }
+function Invoke-Hc([string[]]$Arguments) { Receive-Hc (Start-Hc $Arguments) }
+
+# Every terminal with its details in one `hc connect` call (hello, then terminal.list),
+# instead of one `hc get` process per terminal. Returns the raw `result` JSON, or $null.
+function Get-HcList {
+    $p = $null
+    try {
+        if (-not $script:HcExe) { $script:HcExe = (Get-Command hc -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source }
+        $psi = New-Object System.Diagnostics.ProcessStartInfo($script:HcExe)
+        $psi.Arguments = 'connect'
+        $psi.RedirectStandardInput = $true
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError = $true
+        $psi.UseShellExecute = $false
+        $psi.CreateNoWindow = $true
+        $psi.StandardOutputEncoding = $Utf8
+        $p = [System.Diagnostics.Process]::Start($psi)
+        $null = $p.StandardError.ReadToEndAsync()
+        $p.StandardInput.WriteLine('{"jsonrpc":"2.0","id":0,"method":"hello","params":{}}')
+        $p.StandardInput.WriteLine('{"jsonrpc":"2.0","id":1,"method":"terminal.list","params":{}}')
+        $p.StandardInput.Flush()
+        for ($i = 0; $i -lt 10; $i++) {
+            $read = $p.StandardOutput.ReadLineAsync()
+            if (-not $read.Wait(20000) -or $null -eq $read.Result) { return $null }
+            $line = $read.Result
+            if ($line -match '^\{"id":1,"jsonrpc":"2\.0","result":(.*)\}\s*$') { return $Matches[1] }
+            if ($line -match '^\{"id":1,') { return $null }
+        }
+        $null
+    }
+    catch { $null }
+    finally {
+        if ($p) { try { $p.StandardInput.Close() } catch {}; try { if (-not $p.HasExited) { $p.Kill() } } catch {} }
+    }
+}
 
 function Get-Snapshot {
     # Returns @{ json; signature } or throws with a reason.
-    $lsText = Invoke-Hc @('ls', '--json')
+    $lsCall = Start-Hc @('ls', '--json')
+    $listText = Get-HcList
+    if (-not $listText) { throw 'hc connect failed (is herdr-core running?)' }
+    $lsText = Receive-Hc $lsCall
     if (-not $lsText) { throw 'hc ls failed (is herdr-core running?)' }
-    $ls = $lsText | ConvertFrom-Json
-
-    $gets = @()
-    $roots = @()
-    $sigLines = @()
-    foreach ($t in @($ls.terminals)) {
-        $addr = "$($t.address)"
-        if ($t.state -ne 'live' -or $addr -match '/') { continue }
-        $text = Invoke-Hc @('get', $addr, '--json')
-        if (-not $text) { continue }
-        $d = $text | ConvertFrom-Json
-        $gets += , @($addr, $text)
-        if ($d.pid) { $roots += [int]$d.pid }
-        # Only terminals Herdr shows count as a change: hidden workers come and go all day.
-        if ($d.labels -and $d.labels.'herdr.space') { $sigLines += "$addr $(@($d.foreground.argv) -join ' ')" }
-    }
+    $list = $listText | ConvertFrom-Json
 
     $all = @{}
     $children = @{}
-    foreach ($p in Get-CimInstance Win32_Process -Property ProcessId, ParentProcessId, CreationDate, Name, ExecutablePath) {
+    foreach ($p in Get-CimInstance Win32_Process -Property ProcessId, ParentProcessId, CreationDate, Name, ExecutablePath, CommandLine) {
         $id = [int]$p.ProcessId
         $all[$id] = $p
         $pp = [int]$p.ParentProcessId
         if (-not $children.ContainsKey($pp)) { $children[$pp] = New-Object System.Collections.ArrayList }
         [void]$children[$pp].Add($id)
+    }
+
+    $roots = @()
+    $sigLines = @()
+    $local = 0
+    foreach ($d in @($list.terminals)) {
+        $addr = "$($d.address)"
+        if ($d.state -ne 'live' -or $addr -match '/') { continue }
+        $local++
+        if ($d.pid) { $roots += [int]$d.pid }
+        # Only terminals Herdr shows count as a change: hidden workers come and go all day.
+        if ($d.labels -and $d.labels.'herdr.space') { $sigLines += "$addr $(@($d.foreground.argv) -join ' ')" }
     }
 
     # Claude session files of live processes.
@@ -100,10 +143,13 @@ function Get-Snapshot {
         foreach ($f in Get-ChildItem -LiteralPath $sessionDir -Filter '*.json' -File) {
             $sp = 0
             if (-not [int]::TryParse($f.BaseName, [ref]$sp) -or -not $all.ContainsKey($sp)) { continue }
+            # Only whole-looking objects (Claude rewrites these while it runs); the session id
+            # by pattern, which is much faster than parsing every file.
             $text = (Read-Text $f.FullName).Trim()
-            try { $s = $text | ConvertFrom-Json } catch { continue }
+            if (-not ($text.StartsWith('{') -and $text.EndsWith('}'))) { continue }
+            $sid = if ($text -match '"sessionId"\s*:\s*"([^"]+)"') { $Matches[1] } else { '' }
             $sessions += , @($sp, $text)
-            $sigLines += "session $sp $($s.sessionId)"
+            $sigLines += "session $sp $sid"
         }
     }
 
@@ -124,15 +170,16 @@ function Get-Snapshot {
         if (-not $p) { continue }
         $start = if ($p.CreationDate) { ([DateTimeOffset]$p.CreationDate).ToUnixTimeMilliseconds() } else { 0 }
         $procJson += '{"pid":' + $id + ',"ppid":' + [int]$p.ParentProcessId + ',"start":' + $start +
-            ',"name":' + (ConvertTo-JsonString $p.Name) + ',"path":' + (ConvertTo-JsonString $p.ExecutablePath) + '}'
+            ',"name":' + (ConvertTo-JsonString $p.Name) + ',"path":' + (ConvertTo-JsonString $p.ExecutablePath) +
+            # Script runtimes: their command line says which agent they run (npm installs).
+            $(if ($p.Name -match '^(node|bun|deno|python3?|uv)\.exe$') { ',"args":' + (ConvertTo-JsonString $p.CommandLine) } else { '' }) + '}'
     }
 
-    $getJson = ($gets | ForEach-Object { (ConvertTo-JsonString $_[0]) + ':' + $_[1] }) -join ','
     $savedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     $json = '{"version":2,"savedAt":' + $savedAt + ',"platform":"windows","ls":' + $lsText +
-        ',"get":{' + $getJson + '},"processes":[' + ($procJson -join ',') + '],"sessions":[' +
+        ',"list":' + $listText + ',"processes":[' + ($procJson -join ',') + '],"sessions":[' +
         (($sessions | ForEach-Object { $_[1] }) -join ',') + ']}'
-    @{ json = $json; signature = (($sigLines | Sort-Object) -join "`n"); terminals = $gets.Count; claude = $sessions.Count }
+    @{ json = $json; signature = (($sigLines | Sort-Object) -join "`n"); terminals = $local; claude = $sessions.Count }
 }
 
 function Save-Snapshot {

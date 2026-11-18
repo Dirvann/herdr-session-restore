@@ -50,14 +50,19 @@ snapshot() {
   TZ=UTC0 LC_ALL=C ps -A -o pid= -o ppid= -o lstart= -o comm= > "$work/ps" 2>/dev/null
   awk '{print $1}' "$work/ps" > "$work/pids"
 
+  # Every `hc get` at once, each into its own file.
+  addrs=$(printf '%s' "$ls_json" | grep -o '"address":"[^"/]*"' | sed 's/^"address":"//; s/"$//')
+  for a in $addrs; do "$hc_bin" get "$a" --json > "$work/get.$a" 2>/dev/null & done
+  wait
+
   {
     printf '{"version":2,"savedAt":%s000,"platform":"%s","ls":' "$(date +%s)" "$platform"
     printf '%s' "$ls_json"
     printf ',"get":{'
     first=1
-    for a in $(printf '%s' "$ls_json" | grep -o '"address":"[^"/]*"' | sed 's/^"address":"//; s/"$//'); do
-      g=$("$hc_bin" get "$a" --json 2>/dev/null) || continue
-      [ -n "$g" ] || continue
+    for a in $addrs; do
+      g=$(cat "$work/get.$a" 2>/dev/null)
+      case "$g" in '{'*'}') ;; *) continue ;; esac
       [ $first -eq 1 ] || printf ','
       first=0
       printf '"%s":%s' "$a" "$g"

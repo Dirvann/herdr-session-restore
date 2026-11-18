@@ -10,7 +10,7 @@ import * as fs from "fs/promises";
 import { readable, entries, nowState, buildPlan, pickSnapshot } from "./plan.js";
 
 const SNAPSHOTS_SHOWN = 20;
-const keyOf = (r) => `${r.address}|${r.sessionId ?? r.command}`;
+const keyOf = (r) => `${r.address}|${r.sessionId ?? r.agent ?? r.command}`;
 const shortId = (id) => (id ?? "").slice(0, 8);
 const timeOf = (ms) => {
   const d = new Date(ms);
@@ -59,6 +59,7 @@ const STATE = {
   ready: { label: "Ready", tone: "accent" },
   running: { label: "Already running", tone: "dim" },
   busy: { label: "Tab is busy", tone: "dim" },
+  duplicate: { label: "Same folder", tone: "dim" },
   gone: { label: "Tab gone", tone: "muted" },
   copy: { label: "Command", tone: "muted" },
 };
@@ -138,7 +139,7 @@ export default class SessionRestore extends View {
     const spaceIds = new Set(spaces().filter((s) => !s.machine).map((s) => s.id));
     return {
       chosen: at >= 0 ? list[at].file : null,
-      snapshots: list.map((s) => ({ file: s.file, savedAt: s.snap.savedAt, claude: entries(s.snap).filter((e) => e.kind === "claude").length })),
+      snapshots: list.map((s) => ({ file: s.file, savedAt: s.snap.savedAt, claude: entries(s.snap).filter((e) => e.kind === "claude" || e.kind === "agent").length })),
       rows: at >= 0 ? buildPlan(list[at].snap, live, spaceIds) : [],
     };
   }
@@ -232,11 +233,14 @@ export default class SessionRestore extends View {
     const s = STATE[r.state] ?? { label: r.state, tone: "muted" };
     const tone = s.tone === "accent" ? t.accent : s.tone === "dim" ? t.dim : t.muted;
     const title = `${r.spaceName || "?"} / ${r.tabName || r.title || r.address}`;
-    const note = r.state === "gone" ? (r.newTab ? "opens in a new tab" : "its space is gone too")
+    const note = r.state === "duplicate" ? `as ${r.sameAs}`
+      : r.state === "gone" ? (r.newTab ? "opens in a new tab" : "its space is gone too")
       : r.state === "ready" && !r.send && r.newTab ? "opens in a new tab" : null;
     const sub = r.kind === "command"
       ? r.command
-      : `${shortPath(r.cwd)} · ${shortId(r.sessionId)}${r.wsl ? " · WSL" : ""}`;
+      : r.kind === "agent"
+        ? `${shortPath(r.cwd)} · ${r.agentName} · latest in folder`
+        : `${shortPath(r.cwd)} · ${shortId(r.sessionId)}${r.wsl ? " · WSL" : ""}`;
     return h_flex().id(`row-${i}`).px(14).py(8).gap(12).items_center().rounded(8)
       .when(can, (el) => el.cursor_pointer().hover((st) => st.bg(t.hover)).on_click((_e, cx) => this.toggle(r, cx)))
       .child(r.kind === "command" ? div().w(16).flex_none() : this.checkbox(t, on, can))
@@ -259,7 +263,7 @@ export default class SessionRestore extends View {
     const cur = list[at];
     const go = (d) => (cx) => { const n = list[at + d]; if (n) this.load(cx, n.file); };
     return h_flex().px(14).gap(8).items_center().text_size(12).text_color(t.muted)
-      .child(div().child(cur ? `Saved ${timeOf(cur.savedAt)} · ${cur.claude} Claude session${cur.claude === 1 ? "" : "s"}` : "No snapshot yet"))
+      .child(div().child(cur ? `Saved ${timeOf(cur.savedAt)} · ${cur.claude} agent session${cur.claude === 1 ? "" : "s"}` : "No snapshot yet"))
       .child(div().flex_1())
       .child(this.button(t, "older", "‹ Older", go(1), { disabled: this.loading || at < 0 || at >= list.length - 1 }))
       .child(this.button(t, "newer", "Newer ›", go(-1), { disabled: this.loading || at <= 0 }));
@@ -283,8 +287,8 @@ export default class SessionRestore extends View {
   render(cx) {
     const t = theme();
     const rows = this.plan?.rows ?? [];
-    const order = { ready: 0, gone: 1, busy: 2, running: 3 };
-    const claude = rows.filter((r) => r.kind === "claude");
+    const order = { ready: 0, gone: 1, busy: 2, duplicate: 3, running: 4 };
+    const claude = rows.filter((r) => r.kind === "claude" || r.kind === "agent");
     const open = claude.filter((r) => r.state !== "running").sort((a, b) => (order[a.state] ?? 9) - (order[b.state] ?? 9));
     const running = claude.filter((r) => r.state === "running");
     const commands = rows.filter((r) => r.kind === "command");
@@ -312,7 +316,7 @@ export default class SessionRestore extends View {
                   .children(commands.map((r, i) => this.row(t, r, 1000 + i))));
     return v_flex().size_full().bg(t.popover ?? t.surface).text_color(t.foreground).py(14).gap(10)
       .child(h_flex().px(14).items_center()
-        .child(div().text_size(16).font_semibold().child("Resume Claude sessions"))
+        .child(div().text_size(16).font_semibold().child("Resume agent sessions"))
         .child(div().flex_1())
         .child(div().text_size(11).text_color(t.dim).child("Ctrl+Shift+R")))
       .child(this.snapshotBar(t))

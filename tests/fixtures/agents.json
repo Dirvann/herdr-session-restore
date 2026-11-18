@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "savedAt": 1794962000000,
+  "platform": "linux",
+  "ls": { "terminals": [
+    { "address": "t1", "agent": "codex", "state": "live" },
+    { "address": "t2", "agent": "bash", "state": "live" },
+    { "address": "t3", "agent": "codex", "state": "live" },
+    { "address": "t4", "agent": "bash", "state": "live" },
+    { "address": "t5", "agent": "bash", "state": "live" },
+    { "address": "t6", "agent": "bash", "state": "live" }
+  ] },
+  "get": {
+    "t1": { "address": "t1", "argv": ["bash"], "cwd": "/home/alex/code/shop", "foreground": { "argv": ["codex"], "cwd": "/home/alex/code/shop", "name": "codex", "pid": 1010 }, "labels": { "herdr.space": "spcS", "herdr.tab": "tab1", "where": "shop / codex" }, "pid": 1000, "state": "live" },
+    "t2": { "address": "t2", "argv": ["bash"], "cwd": "/home/alex/blog", "foreground": { "argv": ["node", "/home/alex/.npm-global/lib/node_modules/@google/gemini-cli/dist/index.js"], "cwd": "/home/alex/blog", "name": "node", "pid": 2010 }, "labels": { "herdr.space": "spcB", "herdr.tab": "tab2", "where": "blog / gemini" }, "pid": 2000, "state": "live" },
+    "t3": { "address": "t3", "argv": ["zsh"], "cwd": "/home/alex/code/shop", "foreground": { "argv": ["codex", "--model", "o9"], "cwd": "/home/alex/code/shop", "name": "codex", "pid": 3010 }, "labels": { "herdr.space": "spcS", "herdr.tab": "tab3", "where": "shop / codex 2" }, "pid": 3000, "state": "live" },
+    "t4": { "address": "t4", "argv": ["bash"], "cwd": "/home/alex/notes", "foreground": { "argv": ["opencode"], "cwd": "/home/alex/notes", "name": "opencode", "pid": 4010 }, "labels": { "herdr.space": "spcN", "herdr.tab": "tab4", "where": "notes / opencode" }, "pid": 4000, "state": "live" },
+    "t5": { "address": "t5", "argv": ["fish"], "cwd": "/home/alex/garden", "foreground": { "argv": ["kiro-cli", "chat"], "cwd": "/home/alex/garden", "name": "kiro-cli", "pid": 5010 }, "labels": { "herdr.space": "spcG", "herdr.tab": "tab5", "where": "garden / kiro" }, "pid": 5000, "state": "live" },
+    "t6": { "address": "t6", "argv": ["bash"], "cwd": "/home/alex", "foreground": { "argv": ["bash"], "cwd": "/home/alex", "name": "bash", "pid": 6000 }, "labels": { "herdr.space": "spcH", "herdr.tab": "tab6", "where": "home / shell" }, "pid": 6000, "state": "live" }
+  },
+  "processes": [
+    { "pid": 1000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "bash" },
+    { "pid": 1010, "ppid": 1000, "start": "Wed Nov 18 08:00:05 2026", "name": "codex" },
+    { "pid": 2000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "bash" },
+    { "pid": 2010, "ppid": 2000, "start": "Wed Nov 18 08:00:05 2026", "name": "node" },
+    { "pid": 3000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "zsh" },
+    { "pid": 3010, "ppid": 3000, "start": "Wed Nov 18 08:00:05 2026", "name": "codex" },
+    { "pid": 4000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "bash" },
+    { "pid": 4010, "ppid": 4000, "start": "Wed Nov 18 08:00:05 2026", "name": "opencode" },
+    { "pid": 5000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "fish" },
+    { "pid": 5010, "ppid": 5000, "start": "Wed Nov 18 08:00:05 2026", "name": "kiro-cli" },
+    { "pid": 6000, "ppid": 1, "start": "Wed Nov 18 08:00:00 2026", "name": "bash" }
+  ],
+  "sessions": []
+}
