@@ -1,0 +1,87 @@
+<!doctype html>
+<!-- Source of docs/assets/how-it-works.png (1600x540). Render like showcase.html, --window-size=1600,540. -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #0c0e12; --card: #13161c; --win: #0f1116; --line: #262a33; --fg: #eef1f6; --muted: #9aa3b2; --dim: #6b7383;
+    --accent: #8fb3ff; --accent-2: #b59cff; --ok: #7ad3a2; --warn: #e7b46a; --claude: #e08a5f;
+    --sans: "Inter", "Segoe UI", system-ui, sans-serif; --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1600px; height: 540px; overflow: hidden; background: var(--bg); color: var(--fg); font-family: var(--sans); }
+  .row { display: grid; grid-template-columns: 1fr 56px 1fr 56px 1fr; align-items: stretch; padding: 56px 64px; height: 100%; }
+  .arrow { align-self: center; justify-self: center; color: var(--dim); font-size: 34px; }
+  .card { display: flex; flex-direction: column; gap: 22px; }
+  .num { font-family: var(--mono); font-size: 15px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; }
+  h2 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  p { font-size: 19px; line-height: 1.45; color: var(--muted); }
+  p code { font-family: var(--mono); font-size: 17px; color: var(--fg); }
+  .win { height: 250px; flex: none; border: 1px solid var(--line); border-radius: 12px; background: var(--win); overflow: hidden; display: flex; flex-direction: column; }
+  .tabs { display: flex; gap: 6px; padding: 9px 10px; border-bottom: 1px solid var(--line); background: #12151b; }
+  .tab { font-size: 13px; padding: 5px 10px; border-radius: 6px; color: var(--muted); background: #1a1e25; }
+  .tab.on { color: var(--fg); background: #232832; }
+  .term { padding: 16px 18px; font-family: var(--mono); font-size: 14px; white-space: nowrap; line-height: 1.75; color: var(--muted); }
+  .cursor { display: inline-block; width: 9px; height: 18px; background: var(--fg); vertical-align: -3px; }
+  .c { color: var(--claude); } .f { color: var(--fg); } .d { color: var(--dim); } .a { color: var(--accent); }
+  .keys { display: flex; align-items: center; gap: 8px; padding: 18px 18px 8px; }
+  kbd { font-family: var(--sans); font-weight: 600; font-size: 17px; color: var(--fg); padding: 7px 13px; border-radius: 8px; background: linear-gradient(#20242c, #181b21); border: 1px solid #343944; box-shadow: 0 2px 0 #0a0b0e; }
+  .plus { color: var(--dim); }
+  .list { padding: 6px 12px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .item { display: flex; align-items: center; gap: 12px; padding: 8px 8px; border-radius: 8px; font-size: 15px; }
+  .item.on { background: #171b22; }
+  .box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #3a404c; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #0c0e12; flex: none; }
+  .item.on .box { background: var(--accent); border-color: var(--accent); }
+  .item .state { margin-left: auto; font-size: 12px; color: var(--accent); }
+  .item.off { color: var(--dim); } .item.off .state { color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="card">
+    <div class="num">1 · After a reboot</div>
+    <div class="win">
+      <div class="tabs"><span class="tab on">shop / checkout-api</span><span class="tab">blog / drafts</span><span class="tab">docs</span></div>
+      <div class="term">
+        <div class="d">Microsoft Windows</div>
+        <div>&nbsp;</div>
+        <div><span class="f">C:\Users\alex\code\shop&gt;</span> <span class="cursor"></span></div>
+      </div>
+    </div>
+    <h2>Tabs come back empty</h2>
+    <p>herdr-core restores every space and tab, but as a bare shell: the Claude that ran there is gone.</p>
+  </div>
+  <div class="arrow">→</div>
+  <div class="card">
+    <div class="num">2 · One key</div>
+    <div class="win">
+      <div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>R</kbd></div>
+      <div class="list">
+        <div class="item on"><span class="box">✓</span>shop / checkout-api<span class="state">Ready</span></div>
+        <div class="item on"><span class="box">✓</span>blog / drafts<span class="state">Ready</span></div>
+        <div class="item off"><span class="box"></span>notes / weekly<span class="state">Already running</span></div>
+      </div>
+    </div>
+    <h2>Pick what comes back</h2>
+    <p>The popup lists the sessions each tab ran before. Lost ones are ticked; press <code>Enter</code>.</p>
+  </div>
+  <div class="arrow">→</div>
+  <div class="card">
+    <div class="num">3 · Back to work</div>
+    <div class="win">
+      <div class="tabs"><span class="tab on">shop / checkout-api</span><span class="tab">blog / drafts</span><span class="tab">docs</span></div>
+      <div class="term">
+        <div><span class="f">shop&gt;</span> <span class="a">claude --resume a1b2c3d4</span></div>
+        <div><span class="c">✻</span> <span class="f">Claude Code</span> <span class="d">· ~/code/shop</span></div>
+        <div><span class="d">&gt;</span> <span class="f">Ship the new checkout flow</span></div>
+        <div><span class="c">●</span> Picking up where we left off…</div>
+      </div>
+    </div>
+    <h2>Same tab, same conversation</h2>
+    <p>Each session resumes in the tab it came from with <code>claude --resume</code>. Nothing else is run.</p>
+  </div>
+</div>
+</body>
+</html>

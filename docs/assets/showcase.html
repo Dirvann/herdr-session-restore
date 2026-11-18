@@ -1,0 +1,63 @@
+<!doctype html>
+<!-- Source of herdr/session-restore/preview.png (1600x1000). Render:
+     msedge --headless --hide-scrollbars --window-size=1600,1000 --virtual-time-budget=4000 --screenshot=preview.png showcase.html -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #0c0e12; --panel: #15181e; --line: #262a33; --fg: #eef1f6; --muted: #9aa3b2; --dim: #6b7383;
+    --accent: #8fb3ff; --accent-2: #b59cff; --ok: #7ad3a2;
+    --sans: "Inter", "Segoe UI", system-ui, sans-serif; --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: var(--bg); color: var(--fg); font-family: var(--sans); }
+  .stage { position: relative; width: 100%; height: 100%; display: grid; grid-template-columns: 760px 1fr; align-items: center; padding: 0 0 0 104px; }
+  /* backdrop: a faint dot grid and a glow behind the popup */
+  .stage::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse at 70% 50%, #000 0%, transparent 75%); }
+  .glow { position: absolute; width: 900px; height: 900px; right: -80px; top: 50px; background: radial-gradient(circle, rgba(143,179,255,0.20), rgba(181,156,255,0.08) 40%, transparent 68%); filter: blur(10px); }
+  .copy { position: relative; display: flex; flex-direction: column; gap: 34px; }
+  .eyebrow { font-family: var(--mono); font-size: 18px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; }
+  h1 { font-size: 96px; line-height: 1.0; font-weight: 800; letter-spacing: -0.035em; }
+  h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; color: transparent; }
+  .pitch { font-size: 31px; line-height: 1.4; color: var(--muted); max-width: 600px; font-weight: 400; }
+  .pitch b { color: var(--fg); font-weight: 600; }
+  .keys { display: flex; align-items: center; gap: 12px; font-size: 22px; color: var(--muted); }
+  kbd { font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--fg); padding: 10px 18px; border-radius: 10px; background: linear-gradient(#20242c, #181b21); border: 1px solid #343944; box-shadow: 0 3px 0 #0a0b0e, inset 0 1px 0 rgba(255,255,255,0.06); }
+  .plus { color: var(--dim); }
+  .then { margin-left: 10px; }
+  ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 14px; font-size: 22px; color: var(--muted); }
+  li { display: flex; gap: 14px; align-items: baseline; }
+  li::before { content: "✓"; color: var(--ok); font-weight: 700; }
+  .chips { display: flex; gap: 10px; }
+  .chip { font-family: var(--mono); font-size: 16px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: rgba(255,255,255,0.02); }
+  .shot { position: relative; justify-self: center; }
+  .shot img { position: relative; z-index: 1; display: block; width: 640px; border-radius: 14px; border: 1px solid #2c313b; box-shadow: 0 40px 90px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03); }
+  /* a ghost window behind the popup, so it reads as "inside Herdr" */
+  .ghost { position: absolute; inset: 46px -46px -46px 46px; border-radius: 16px; border: 1px solid #1f232b; background: linear-gradient(160deg, #141720, #0f1116); }
+  .ghost { z-index: 0; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="glow"></div>
+  <div class="copy">
+    <div class="eyebrow">Herdr mod · Claude Code</div>
+    <h1>Session<br><span>Restore</span></h1>
+    <p class="pitch">Your Claude Code sessions, <b>back in their tabs</b> after every reboot or crash.</p>
+    <div class="keys"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>R</kbd><span class="then">then</span><kbd>Enter</kbd></div>
+    <ul>
+      <li>Autosaves which session runs in which tab, every 5 minutes</li>
+      <li>Only ever runs <span style="font-family:var(--mono);color:var(--fg);font-size:20px">claude --resume</span></li>
+      <li>No hooks, no settings, no layout changes</li>
+    </ul>
+    <div class="chips"><span class="chip">Windows</span><span class="chip">Linux</span><span class="chip">macOS</span><span class="chip">MIT</span></div>
+  </div>
+  <div class="shot">
+    <div class="ghost"></div>
+    <img src="popup.png" alt="">
+  </div>
+</div>
+</body>
+</html>

@@ -41,6 +41,14 @@ herdr/session-restore/mods/session-restore/
 tests/        node --test, fixtures in tests/fixtures (made up)
 ```
 
+## Images
+
+`herdr/session-restore/preview.png` (shown on herdr.dev/mods and as the README hero) and
+`docs/assets/how-it-works.png` are rendered from `docs/assets/showcase.html` and
+`steps.html` with headless Edge or Chrome (command in each file's top comment).
+`docs/assets/popup.png` is a real screenshot of the popup fed made-up rows. Keep all of
+them free of real data.
+
 ## Things that are not obvious
 
 - `herdr-app.exe` is a GUI-subsystem program on Windows: PowerShell's `&` neither waits

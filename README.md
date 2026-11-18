@@ -1,9 +1,21 @@
-# Session restore for Herdr
+<p align="center">
+  <img src="herdr/session-restore/preview.png" alt="Session Restore for Herdr: your Claude Code sessions, back in their tabs after every reboot" width="100%">
+</p>
 
-Get your Claude Code sessions back into their [Herdr](https://herdr.dev) tabs after a
-reboot or a crash.
+<p align="center">
+  <a href="https://herdr.dev/mods"><img src="https://img.shields.io/badge/Herdr-mod-8fb3ff?style=flat-square" alt="Herdr mod"></a>
+  <img src="https://img.shields.io/badge/Claude%20Code-sessions-e08a5f?style=flat-square" alt="Claude Code">
+  <img src="https://img.shields.io/badge/platforms-Windows%20%C2%B7%20Linux%20%C2%B7%20macOS%20(beta)-7ad3a2?style=flat-square" alt="Windows, Linux, macOS (beta)">
+  <img src="https://img.shields.io/badge/dependencies-none-9aa3b2?style=flat-square" alt="No dependencies">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b59cff?style=flat-square" alt="MIT license"></a>
+</p>
 
-![The session restore popup](herdr/session-restore/preview.png)
+<p align="center">
+  <b>Get your Claude Code sessions back into their <a href="https://herdr.dev">Herdr</a> tabs after a reboot or a crash.</b><br>
+  One key, one popup, every session where it was.
+</p>
+
+---
 
 herdr-core brings every space, tab and folder back after a restart, but each terminal
 comes back as an empty shell: the command that ran there is never started again. This
@@ -11,12 +23,21 @@ mod saves, every 5 minutes, which Claude Code session runs in which terminal. Af
 restart you press **Ctrl+Shift+R**, tick the sessions you want, and press **Enter**:
 each one resumes in its own tab with `claude --resume`.
 
-- Windows, Linux and macOS, with nothing extra to install (Windows PowerShell on
-  Windows, plain `sh` elsewhere).
-- Never runs anything but `claude --resume`. Other programs that ran in a tab are listed
-  with a Copy button.
-- Never resumes a session that is already running, never types into a busy tab.
-- No Claude Code hooks or settings changes, no layout changes.
+## How it works
+
+<p align="center">
+  <img src="docs/assets/how-it-works.png" alt="1. After a reboot, tabs come back empty. 2. Press Ctrl+Shift+R and pick the sessions. 3. Each resumes in its tab." width="100%">
+</p>
+
+## Safe by design
+
+| | |
+|---|---|
+| **Only `claude --resume`** | Never runs anything else. Other programs that ran in a tab (say `npm run dev`) are listed with a Copy button. |
+| **Never twice** | A session that is already running anywhere is shown, not resumed. |
+| **Never into a busy tab** | Text is only typed into a shell sitting at its prompt, checked again right before. |
+| **Hands off your setup** | No Claude Code hooks or settings changes, no layout changes. |
+| **Nothing to install** | Windows PowerShell on Windows, plain `sh` on Linux and macOS. |
 
 ## Install
 
@@ -83,6 +104,7 @@ herdr/session-restore/           the folder Herdr's gallery installs from
     save.sh      saver for Linux and macOS
 tests/           node tests for plan.js (made-up fixtures)
 docs/design.md   why it works the way it does
+docs/assets/     README images; showcase.html and steps.html are their sources
 ```
 
 `npm test` runs the tests (Node 20+; only needed for development). See
